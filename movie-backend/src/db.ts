@@ -1,4 +1,6 @@
-const knex = require("knex")({
+import Kenex from "knex";
+
+const knex = Kenex({
   client: "mysql",
   connection: {
     host: "127.0.0.1",
