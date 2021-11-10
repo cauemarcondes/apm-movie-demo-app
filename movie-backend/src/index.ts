@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import directorsRouter from "./api/directors";
 // showcase example app with automatic instrumentation
 import genreRouter from "./api/genres";
@@ -12,7 +12,12 @@ app.use("/directors", directorsRouter);
 app.use("/movies", moviesRouter);
 
 // then register any other middleware error handlers
-function errorHandler(err: Error, req: Request, res: Response) {
+function errorHandler(
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   if (err instanceof ParamsNotAllowedError) {
     res.status(400);
   } else if (res.status) {
