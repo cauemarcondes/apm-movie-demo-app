@@ -26,11 +26,11 @@ export async function fetchGenres(params?: {
 
 // fetch directors that match given params
 export async function fetchDirectors(params?: {
-  name?: string;
+  names?: string[];
 }): Promise<Director[]> {
   let director_q = knex<Director[]>("director").select("id", "name");
-  if (params?.name) {
-    director_q = addParam(director_q, "name", params.name);
+  if (params?.names) {
+    director_q = addParam(director_q, "name", params.names);
   }
   const directors = await director_q;
   return directors || [];
@@ -41,14 +41,14 @@ export async function fetchDirectors(params?: {
 // comment this out in favor of the commented method below for fixing the N+1 issue
 export async function fetchMoviesNPlus1(params?: {
   genre?: string;
-  director?: string;
+  directors?: string[];
 }): Promise<Movie[]> {
   // fetch genre_ids
   const genres = await fetchGenres({ name: params?.genre });
   const genresIds = genres.map((g) => g.id);
 
   // fetch director_ids
-  const directors = await fetchDirectors({ name: params?.director });
+  const directors = await fetchDirectors({ names: params?.directors });
   const directorsIds = directors.map((d) => d.id);
 
   // only return movies with matching genre_id and director_id
@@ -77,7 +77,7 @@ export async function fetchMoviesNPlus1(params?: {
 // supported query parameters are `genre` and `director`
 export async function fetchMovies(params?: {
   genre?: string;
-  director?: string;
+  directors?: string[];
 }): Promise<Movie[]> {
   let q = knex<Movie[]>("movie")
     .join("genre", "movie.genre_id", "=", "genre.id")
@@ -93,10 +93,10 @@ export async function fetchMovies(params?: {
       addParam(knex("genre").select("id"), "name", params.genre)
     );
   }
-  if (params?.director) {
+  if (params?.directors) {
     q = q.whereIn(
       "movie.director_id",
-      addParam(knex("director").select("id"), "name", params.director)
+      addParam(knex("director").select("id"), "name", params.directors)
     );
   }
   const movies = await q;
