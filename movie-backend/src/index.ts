@@ -1,8 +1,8 @@
 import express, { Request, Response, NextFunction } from "express";
 import directorsRouter from "./api/directors";
-// showcase example app with automatic instrumentation
 import genreRouter from "./api/genres";
-import { moviesRouter, ParamsNotAllowedError } from "./api/movies";
+import { moviesRouter } from "./api/movies";
+import { ParamsNotAllowedError } from "./errors";
 
 const app = express();
 const port = 3001;
@@ -18,6 +18,7 @@ function errorHandler(
   res: Response,
   next: NextFunction
 ) {
+  console.log("### caue ~ err", err);
   if (err instanceof ParamsNotAllowedError) {
     res.status(400);
   } else if (res.status) {

@@ -1,4 +1,5 @@
 import Kenex from "knex";
+import { MovieNotFoundError } from "./errors";
 import { Director, Genre, Movie } from "./typings";
 
 const knex = Kenex({
@@ -52,10 +53,10 @@ export async function fetchMoviesNPlus1(params?: {
   const directorsIds = directors.map((d) => d.id);
 
   // only return movies with matching genre_id and director_id
-  let movies: any = [];
+  let movies: Movie[] = [];
   for (const genre_id of genresIds) {
     for (const director_id of directorsIds) {
-      let m = await knex("movie")
+      let m = await knex<Movie[]>("movie")
         .join("genre", "movie.genre_id", "=", "genre.id")
         .join("director", "movie.director_id", "=", "director.id")
         .select({
@@ -111,7 +112,7 @@ function addParam(query: any, key: any, val: any) {
   return query.where(key, val);
 }
 
-function raiseErrorIfEmpty(movies: any, params: any) {
+function raiseErrorIfEmpty(movies: Movie[], params: any) {
   if (movies.length === 0) {
     let query = "";
     let concatenator = "";
@@ -120,12 +121,5 @@ function raiseErrorIfEmpty(movies: any, params: any) {
       concatenator = "&";
     }
     throw new MovieNotFoundError(query);
-  }
-}
-
-export class MovieNotFoundError extends Error {
-  constructor(params: any) {
-    super(`No movies found for ${params}`);
-    this.name = "MovieNotFoundError";
   }
 }
