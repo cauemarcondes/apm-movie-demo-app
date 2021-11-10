@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect } from "react";
 
 function Genre({ onChange }) {
   const [error, setError] = useState(null);
@@ -10,37 +9,40 @@ function Genre({ onChange }) {
     // fetch types from backend
     fetch("/genres")
       .then((res) => {
-        return res.json()
+        return res.json();
       })
-      .then((res) => {
-        setGenres(res)
-        setIsLoaded(true)
-      },
+      .then(
+        (res) => {
+          setGenres(res);
+          setIsLoaded(true);
+        },
         (error) => {
-          setError(error)
-          setIsLoaded(true)
-        });
+          setError(error);
+          setIsLoaded(true);
+        }
+      );
   }, []);
 
   // react on change
   const handleChange = (input) => {
-    onChange(input.currentTarget.value)
-  }
+    onChange(input.currentTarget.value);
+  };
 
   if (error) {
-    return (
-      <div>An error occured: {error.message} </div>
-    )
+    return <div>An error occured: {error.message} </div>;
   } else if (!isLoaded) {
-    return (
-      <div>Loading ...</div>
-    )
+    return <div>Loading ...</div>;
   } else {
     return (
       <div>
         {genres.map((genre, index) => (
           <div key={index}>
-            <input type="radio" name="genre" value={genre} onChange={handleChange} />
+            <input
+              type="radio"
+              name="genre"
+              value={genre}
+              onChange={handleChange}
+            />
             <label for={genre}>{genre}</label>
           </div>
         ))}
