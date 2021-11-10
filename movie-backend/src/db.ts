@@ -21,7 +21,6 @@ export async function fetchGenres(params?: {
     genre_q = addParam(genre_q, "name", params.name);
   }
   const genres = await genre_q;
-  console.log("### caue ~ genres", genres);
   return genres || [];
 }
 
