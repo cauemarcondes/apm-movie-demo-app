@@ -1,5 +1,5 @@
 import { Router, query } from "express";
-import * as db from "../db";
+import { fetchMovies, fetchMoviesNPlus1, MovieNotFoundError } from "../db";
 import url from "url";
 
 const router = Router();
@@ -10,10 +10,12 @@ router.get("/", async (request, response, next) => {
     if (Array.isArray(request.query.genre)) {
       throw new ParamsNotAllowedError("Only one genre allowed");
     }
-    const movies = await db.fetchMovie(request.query);
+    const movies = await fetchMoviesNPlus1(request.query);
+    // uncomment this for solving the N+1 problem
+    // const movies = await fetchMovies(request.query);
     return response.json(movies);
   } catch (err) {
-    if (err instanceof db.MovieNotFoundError) {
+    if (err instanceof MovieNotFoundError) {
       return response.json([]);
     }
     next(err);

@@ -1,4 +1,5 @@
 import Kenex from "knex";
+import { Director, Genre, Movie } from "./typings";
 
 const knex = Kenex({
   client: "mysql",
@@ -12,41 +13,49 @@ const knex = Kenex({
 });
 
 // fetch all genres
-export async function fetchGenre() {
-  return await knex("genre").select("name");
+export async function fetchGenres(params?: {
+  name?: string;
+}): Promise<Genre[]> {
+  let genre_q = knex<Genre[]>("genre").select("id", "name");
+  if (params?.name) {
+    genre_q = addParam(genre_q, "name", params.name);
+  }
+  const genres = await genre_q;
+  console.log("### caue ~ genres", genres);
+  return genres || [];
 }
 
 // fetch directors that match given params
-export async function fetchDirector() {
-  return await knex("director").select("name");
+export async function fetchDirectors(params?: {
+  name?: string;
+}): Promise<Director[]> {
+  let director_q = knex<Director[]>("director").select("id", "name");
+  if (params?.name) {
+    director_q = addParam(director_q, "name", params.name);
+  }
+  const directors = await director_q;
+  return directors || [];
 }
 
 // supported query parameters are `genre` and `director`
 // N+1 db query example
 // comment this out in favor of the commented method below for fixing the N+1 issue
-export async function fetchMovie(params: any) {
+export async function fetchMoviesNPlus1(params?: {
+  genre?: string;
+  director?: string;
+}): Promise<Movie[]> {
   // fetch genre_ids
-  let genres = [];
-  let genre_q = knex("genre").select("id");
-  if (params.genre) {
-    genre_q = addParam(genre_q, "name", params.genre);
-  }
-  genres = await genre_q;
-  genres = genres.map((g: any) => g.id);
+  const genres = await fetchGenres({ name: params?.genre });
+  const genresIds = genres.map((g) => g.id);
 
   // fetch director_ids
-  let directors = [];
-  let director_q = knex("director").select("id");
-  if (params.director) {
-    director_q = addParam(director_q, "name", params.director);
-  }
-  directors = await director_q;
-  directors = directors.map((d: any) => d.id);
+  const directors = await fetchDirectors({ name: params?.director });
+  const directorsIds = directors.map((d) => d.id);
 
   // only return movies with matching genre_id and director_id
   let movies: any = [];
-  for (const genre_id of genres) {
-    for (const director_id of directors) {
+  for (const genre_id of genresIds) {
+    for (const director_id of directorsIds) {
       let m = await knex("movie")
         .join("genre", "movie.genre_id", "=", "genre.id")
         .join("director", "movie.director_id", "=", "director.id")
@@ -64,26 +73,37 @@ export async function fetchMovie(params: any) {
   return movies;
 }
 
-// // fetchMovies from the database
-// // uncomment this for solving the N+1 problem
-// // supported query parameters are `genre` and `director`
-// async function fetchMovie(params) {
-//     let q = knex('movie')
-//         .join('genre', 'movie.genre_id', '=', 'genre.id')
-//         .join('director', 'movie.director_id', '=', 'director.id')
-//         .select({ title: 'movie.title', genre: 'genre.name', director: 'director.name' })
-//     if (params.genre) {
-//         q = q.whereIn('movie.genre_id',
-//             addParam(knex('genre').select('id'), 'name', params.genre))
-//     }
-//     if (params.director) {
-//         q = q.whereIn('movie.director_id',
-//             addParam(knex('director').select('id'), 'name', params.director))
-//     }
-//     const movies = await q
-//     raiseErrorIfEmpty(movies, params)
-//     return movies
-// }
+// fetchMovies from the database
+// uncomment this for solving the N+1 problem
+// supported query parameters are `genre` and `director`
+export async function fetchMovies(params?: {
+  genre?: string;
+  director?: string;
+}): Promise<Movie[]> {
+  let q = knex<Movie[]>("movie")
+    .join("genre", "movie.genre_id", "=", "genre.id")
+    .join("director", "movie.director_id", "=", "director.id")
+    .select({
+      title: "movie.title",
+      genre: "genre.name",
+      director: "director.name",
+    });
+  if (params?.genre) {
+    q = q.whereIn(
+      "movie.genre_id",
+      addParam(knex("genre").select("id"), "name", params.genre)
+    );
+  }
+  if (params?.director) {
+    q = q.whereIn(
+      "movie.director_id",
+      addParam(knex("director").select("id"), "name", params.director)
+    );
+  }
+  const movies = await q;
+  raiseErrorIfEmpty(movies, params);
+  return movies;
+}
 
 function addParam(query: any, key: any, val: any) {
   if (Array.isArray(val)) {
