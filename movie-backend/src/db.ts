@@ -1,17 +1,9 @@
 import Kenex from "knex";
+import { dbConfig } from "./config/db";
 import { MovieNotFoundError } from "./errors";
 import { Director, Genre, Movie } from "./typings";
 
-const knex = Kenex({
-  client: "mysql",
-  connection: {
-    host: "127.0.0.1",
-    port: 3306,
-    user: "caue", // replace with your mysql user
-    password: "caue123", // replace with your mysql user password
-    database: "moviedemo",
-  },
-});
+const knex = Kenex(dbConfig);
 
 // fetch all genres
 export async function fetchGenres(params?: {
