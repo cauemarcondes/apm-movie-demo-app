@@ -2,6 +2,8 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import type { IMovie } from "../typings";
 import qs from "qs";
+//@ts-ignore
+import { withTransaction } from "@elastic/apm-rum-react";
 
 interface Props {
   genre?: string;
@@ -18,7 +20,7 @@ async function fetchMovies(params: Props) {
   return movies;
 }
 
-export default function Movie({ genre, directors }: Props) {
+function Movie({ genre, directors }: Props) {
   const [error, setError] = useState<Error | undefined>();
   const [isLoaded, setIsLoaded] = useState(false);
   const [movies, setMovies] = useState<IMovie[]>([]);
@@ -73,3 +75,4 @@ export default function Movie({ genre, directors }: Props) {
     </div>
   );
 }
+export default withTransaction("Movie", "component")(Movie);

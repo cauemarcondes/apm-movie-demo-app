@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Director from "./Director";
 import Genre from "./Genre";
 import Movie from "./Movie";
+//@ts-ignore
+import { withTransaction } from "@elastic/apm-rum-react";
 
 function MovieList() {
   const [genre, setGenre] = useState<string | undefined>();
@@ -16,4 +18,5 @@ function MovieList() {
   );
 }
 
-export default MovieList;
+// export default MovieList;
+export default withTransaction("MovieList", "component")(MovieList);

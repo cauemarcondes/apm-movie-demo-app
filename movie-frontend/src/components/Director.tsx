@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
 import axios from "axios";
+//@ts-ignore
+import { withTransaction } from "@elastic/apm-rum-react";
 
 async function fetchDirectors() {
   const { data: directors } = await axios.get<string[]>("/directors");
   return directors;
 }
 
-export default function Director({ onChange }: any) {
+function Director({ onChange }: any) {
   const [error, setError] = useState<Error | undefined>();
   const [isLoaded, setIsLoaded] = useState(false);
   const [options, setOptions] = useState<{ value: string; label: string }[]>(
@@ -51,3 +53,4 @@ export default function Director({ onChange }: any) {
     </div>
   );
 }
+export default withTransaction("Director", "component")(Director);

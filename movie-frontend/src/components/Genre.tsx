@@ -1,12 +1,14 @@
 import axios from "axios";
 import React, { useState, useEffect } from "react";
+//@ts-ignore
+import { withTransaction } from "@elastic/apm-rum-react";
 
 async function fetchGenres() {
   const { data: genres } = await axios.get<string[]>("/genres");
   return genres;
 }
 
-export default function Genre({ onChange }: any) {
+function Genre({ onChange }: any) {
   const [error, setError] = useState<Error | undefined>();
   const [isLoaded, setIsLoaded] = useState(false);
   const [genres, setGenres] = useState<string[]>([]);
@@ -55,3 +57,5 @@ export default function Genre({ onChange }: any) {
     </div>
   );
 }
+
+export default withTransaction("Genre", "component")(Genre);

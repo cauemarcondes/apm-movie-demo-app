@@ -1,3 +1,12 @@
+// Add this to the VERY top of the first file loaded in your app
+var apm = require("elastic-apm-node").start({
+  // Set the custom APM Server URL (default: http://localhost:8200)
+  serverUrl:
+    "https://84124e3c7d844cf09bdd3cd10a3a262a.apm.us-central1.gcp.cloud.es.io:443",
+  // Set the service environment
+  environment: "production",
+  serviceVersion: "1.0",
+});
 import express, { Request, Response, NextFunction } from "express";
 import directorsRouter from "./api/directors";
 import genreRouter from "./api/genres";
