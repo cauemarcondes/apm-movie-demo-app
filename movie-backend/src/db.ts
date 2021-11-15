@@ -1,9 +1,16 @@
 import Kenex from "knex";
+import { resolve } from "path/posix";
 import { dbConfig } from "./config/db";
 import { MovieNotFoundError } from "./errors";
 import { Director, Genre, Movie } from "./typings";
 
 const knex = Kenex(dbConfig);
+
+async function slowAndComplexLogic() {
+  return new Promise((resolve) => {
+    setTimeout(resolve, 5000);
+  });
+}
 
 // fetch all genres
 export async function fetchGenres(params?: {
@@ -39,6 +46,9 @@ export async function fetchMoviesNPlus1(params?: {
   // fetch genre_ids
   const genres = await fetchGenres({ name: params?.genre });
   const genresIds = genres.map((g) => g.id);
+  if (genresIds.length) {
+    await slowAndComplexLogic();
+  }
 
   // fetch director_ids
   const directors = await fetchDirectors({ names: params?.directors });
@@ -72,6 +82,9 @@ export async function fetchMovies(params?: {
   genre?: string;
   directors?: string[];
 }): Promise<Movie[]> {
+  if (params.genre) {
+    await slowAndComplexLogic();
+  }
   let q = knex<Movie[]>("movie")
     .join("genre", "movie.genre_id", "=", "genre.id")
     .join("director", "movie.director_id", "=", "director.id")
