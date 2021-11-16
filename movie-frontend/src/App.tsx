@@ -9,8 +9,8 @@ function App() {
   return (
     <Router>
       <div>
-        <ul>
-          <li>
+        <ul style={{ display: "flex", listStyle: "none" }}>
+          <li style={{ marginRight: 10 }}>
             <Link to="/">Home</Link>
           </li>
           <li>
