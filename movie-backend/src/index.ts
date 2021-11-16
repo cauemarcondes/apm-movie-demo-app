@@ -18,7 +18,6 @@ function errorHandler(
   res: Response,
   next: NextFunction
 ) {
-  console.log("### caue ~ err", err);
   if (err instanceof ParamsNotAllowedError) {
     res.status(400);
   } else if (res.status) {

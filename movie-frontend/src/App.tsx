@@ -1,6 +1,4 @@
-//@ts-ignore
-import { ApmRoute } from "@elastic/apm-rum-react";
-import { BrowserRouter as Router, Link, Switch } from "react-router-dom";
+import { BrowserRouter as Router, Link, Switch, Route } from "react-router-dom";
 import "./App.css";
 import Home from "./components/Home";
 import MovieList from "./components/MovieList";
@@ -19,8 +17,8 @@ function App() {
         </ul>
         <hr />
         <Switch>
-          <ApmRoute exact path="/" component={Home}></ApmRoute>
-          <ApmRoute path="/movies" component={MovieList}></ApmRoute>
+          <Route exact path="/" component={Home}></Route>
+          <Route path="/movies" component={MovieList}></Route>
         </Switch>
       </div>
     </Router>
