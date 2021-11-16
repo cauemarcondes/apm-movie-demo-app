@@ -8,7 +8,7 @@ const knex = Kenex(dbConfig);
 
 async function slowAndComplexLogic() {
   return new Promise((resolve) => {
-    setTimeout(resolve, 5000);
+    setTimeout(resolve, 3000);
   });
 }
 
