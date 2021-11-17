@@ -11,10 +11,10 @@ router.get("/", async (request, response, next) => {
     if (Array.isArray(request.query.genre)) {
       throw new ParamsNotAllowedError("Only one genre allowed");
     }
-    // const movies = await fetchMoviesNPlus1(request.query);
+    const movies = await fetchMoviesNPlus1(request.query);
 
     // uncomment this for solving the N+1 problem
-    const movies = await fetchMovies(request.query);
+    // const movies = await fetchMovies(request.query);
     return response.json(movies);
   } catch (err) {
     if (err instanceof MovieNotFoundError) {
